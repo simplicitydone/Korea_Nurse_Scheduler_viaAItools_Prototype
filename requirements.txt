@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+jinja2
+python-multipart
+pandas
+numpy
+openpyxl
+sqlalchemy
+scikit-learn
+# Development & Testing
+pytest       # 테스트 코드 실행용
+black       # 코드 포맷팅
+isort       # Import 정렬
+torch

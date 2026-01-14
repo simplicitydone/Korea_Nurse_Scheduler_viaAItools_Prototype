@@ -1,0 +1,235 @@
+/* =========================
+   1. Base Layout & Reset
+   ========================= */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f4f5f7;
+  color: #222;
+}
+
+a { color: #1f6feb; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.container { max-width: 1200px; margin: 24px auto; padding: 0 16px; }
+
+/* Header & Nav */
+.top-header {
+  background: #0f172a;
+  color: #fff;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.top-header h1 { margin: 0; font-size: 20px; }
+.top-nav a { margin-left: 16px; color: #cbd5f5; font-size: 14px; }
+.top-nav a.active { color: #fff; font-weight: 600; border-bottom: 2px solid #38bdf8; }
+.ward-badge { font-size: 0.7em; color: #94a3b8; margin-left: 10px; font-weight: normal; }
+
+/* Card Container */
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+}
+.card h2, .card h3 { margin-top: 0; }
+.card-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+
+/* =========================
+   2. Form Elements
+   ========================= */
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; }
+.form-group { display: flex; flex-direction: column; margin-bottom: 10px; }
+.form-group.full-width { grid-column: 1 / -1; }
+.form-group label { font-size: 14px; margin-bottom: 4px; font-weight: 500; }
+
+input[type="text"], input[type="number"], input[type="date"], input[type="month"], select {
+  padding: 6px 8px; font-size: 14px; border-radius: 6px; border: 1px solid #cbd5e1;
+}
+input.input-sm { padding: 4px 8px; font-size: 13px; }
+
+/* Checkbox & Radio Groups */
+.inline-checkbox { display: flex; gap: 12px; align-items: center; font-size: 14px; }
+.radio-group { display: flex; gap: 15px; background: #f9f9f9; padding: 5px 10px; border-radius: 20px; font-size: 14px; }
+
+/* Buttons */
+.form-actions { margin-top: 12px; display: flex; gap: 8px; align-items: center; }
+button {
+  padding: 6px 12px; border-radius: 6px; border: 1px solid #0f172a;
+  background: #0f172a; color: #fff; font-size: 14px; cursor: pointer;
+}
+button.secondary { border-color: #e2e8f0; background: #e2e8f0; color: #111827; }
+button.secondary-btn { border-color: #e2e8f0; background: #fff; color: #111827; }
+button.primary-btn { background: #2563eb; border-color: #2563eb; color: white; }
+button.danger, button.danger-btn { border-color: #fca5a5; background: #fee2e2; color: #b91c1c; }
+button:disabled { opacity: 0.6; cursor: not-allowed; }
+button.text-btn { background: none; border: none; color: #4b5563; text-decoration: underline; padding: 0; }
+
+/* =========================
+   3. Utility Classes
+   ========================= */
+.hidden { display: none !important; }
+.muted { color: #64748b; }
+.small { font-size: 12px; }
+.x-small { font-size: 11px; }
+.error { color: #b91c1c; }
+.input-error { border-color: #b91c1c !important; background-color: #fef2f2; }
+.text-center { text-align: center; }
+
+/* Badge */
+.badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 500; background: #e2e8f0; color: #475569; }
+.badge-success { background: #dcfce7; color: #166534; }
+
+/* =========================
+   4. Personnel Page Specific
+   ========================= */
+/* 선호도 그리드 (Tier 2 UI) */
+.pref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
+.pref-col { display: flex; flex-direction: column; gap: 8px; }
+.pref-label { font-weight: bold; font-size: 0.9em; margin-bottom: 5px; display: block; }
+
+/* Name Autocomplete */
+.name-suggestions {
+  position: absolute; z-index: 1500; background: #fff;
+  border: 1px solid #cbd5e1; border-radius: 6px; margin-top: 2px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18);
+  max-height: 200px; overflow-y: auto; min-width: 160px; font-size: 13px;
+}
+.name-suggestion-item { padding: 6px 12px; cursor: pointer; }
+.name-suggestion-item:hover { background: #eff6ff; }
+
+/* =========================
+   5. Schedule Page Specific
+   ========================= */
+/* Control Panel */
+.panel-row { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+.input-group { display: flex; flex-direction: column; }
+.divider-left { border-left: 1px solid #e2e8f0; padding-left: 20px; }
+.action-group { margin-left: auto; display: flex; gap: 10px; }
+.input-group-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* Dashboard */
+.dashboard { border-left: 5px solid #10b981; background: #f0fdf4; padding: 20px; }
+.dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #bbf7d0; padding-bottom: 10px; }
+.score-value { font-size: 1.8em; font-weight: 800; color: #15803d; }
+.dashboard-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.report-box { background: white; padding: 15px; border-radius: 8px; border: 1px solid #dcfce7; }
+.report-box h4 { margin: 0 0 10px 0; font-size: 14px; color: #166534; }
+.violation-list { list-style: none; padding: 0; margin: 0; max-height: 150px; overflow-y: auto; }
+.violation-list li { padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px; color: #b91c1c; }
+.violation-list li.good { color: #15803d; }
+
+/* Collapsible Section */
+.collapsible-header { background: #f8fafc; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between; font-weight: 600; }
+.collapsible-body { padding: 16px; border: 1px solid #e2e8f0; border-top: none; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
+
+/* Config Cards (AI Rules) */
+.config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-top: 10px; }
+.config-card { background: white; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; display: flex; align-items: center; gap: 15px; transition: transform 0.2s; }
+.config-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.card-icon { font-size: 2em; }
+.card-content { flex: 1; }
+.btn-group { display: flex; gap: 5px; margin-top: 8px; }
+.config-btn { flex: 1; padding: 6px; font-size: 12px; background: white; border: 1px solid #cbd5e1; border-radius: 4px; color: #64748b; }
+.config-btn:hover { background: #f8fafc; }
+.config-btn.active { background: #eff6ff; border-color: #3b82f6; color: #1d4ed8; font-weight: 700; box-shadow: 0 0 0 1px #3b82f6 inset; }
+
+/* Month Nav */
+.month-nav { display: flex; align-items: center; gap: 4px; }
+.month-nav button { padding: 6px 10px; }
+
+/* =========================
+   6. Table Styles (Schedule & Nurse)
+   ========================= */
+/* Common Table */
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table th { background: #f1f5f9; font-weight: 600; text-align: center; border: 1px solid #e2e8f0; padding: 8px; }
+.table td { border: 1px solid #e2e8f0; padding: 6px 8px; }
+
+/* Schedule Table (Fixed Layout) */
+#schedule-table-wrapper { width: 100%; overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 8px; }
+.schedule-table { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; }
+.schedule-table th, .schedule-table td { border: 1px solid #e5e7eb; height: 32px; padding: 0; text-align: center; vertical-align: middle; box-sizing: border-box; }
+.schedule-table thead th { position: sticky; top: 0; z-index: 10; background: #f8fafc; border-bottom: 2px solid #e2e8f0; }
+
+/* Columns Width */
+.schedule-table .col-name { width: 80px; text-align: left; padding-left: 8px; background: #f9fafb; position: sticky; left: 0; z-index: 20; border-right: 2px solid #e2e8f0; }
+.schedule-table .col-team { width: 40px; background: #f9fafb; }
+.schedule-table .col-stats { width: 100px; font-size: 11px; color: #64748b; background: #f9fafb; }
+.schedule-table .col-day { width: auto; min-width: 28px; }
+
+/* Cells */
+.day-cell { cursor: pointer; font-size: 13px; font-weight: 500; transition: background 0.1s; }
+.day-cell:hover { filter: brightness(0.95); }
+
+/* Shift Colors */
+.shift-D { background-color: #dbeafe; color: #1e40af; }
+.shift-E { background-color: #dcfce7; color: #166534; }
+.shift-N { background-color: #fee2e2; color: #991b1b; }
+.shift-O { background-color: #ffffff; color: #374151; }
+.shift-M { background-color: #f3e8ff; color: #6b21a8; }
+.shift- { background-color: #f9fafb; } /* Empty */
+
+.locked-cell { box-shadow: inset 0 0 0 2px #ef4444; } /* Red border for lock */
+
+/* Separator Row */
+.team-separator-row td { background-color: #e2e8f0; height: 6px; border: none; padding: 0; }
+
+/* =========================
+   7. Overlays & Popups
+   ========================= */
+/* Loading Overlay */
+.loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
+.loader-content { text-align: center; display: flex; flex-direction: column; align-items: center; }
+.spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* Cell Editor */
+.cell-editor { position: absolute; z-index: 1000; background: white; border: 1px solid #cbd5e1; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-radius: 8px; padding: 12px; width: 220px; }
+.editor-header { font-weight: bold; margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+.shift-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
+.shift-btn { padding: 8px 0; font-size: 13px; border: 1px solid #e2e8f0; background: white; border-radius: 4px; font-weight: 600; color: #1f2937 !important;}
+.shift-btn.shift-D { border-color: #bfdbfe; }
+.shift-btn.shift-E { border-color: #bbf7d0; }
+.shift-btn.shift-N { border-color: #fecaca; }
+.shift-btn:hover {background: #f1f5f9; filter: none; }
+.lock-option { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #475569; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .form-grid, .dashboard-content { grid-template-columns: 1fr; }
+  .panel-row { flex-direction: column; align-items: flex-start; }
+  .divider-left { border-left: none; padding-left: 0; border-top: 1px solid #e2e8f0; padding-top: 10px; width: 100%; }
+}
+
+button#stop-btn {
+  background-color: #ef4444;
+  color: white;
+  border: 1px solid #dc2626;
+}
+button#stop-btn:hover {
+  background-color: #dc2626;
+}
+
+/* hidden 클래스는 가장 높은 우선순위 */
+.hidden { display: none !important; }
+
+/* 리더 표시 (별표) */
+.leader-badge {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  font-size: 9px;
+  color: #d97706; /* 진한 노란색/주황색 */
+  font-weight: bold;
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
+  pointer-events: none; /* 클릭 방해 금지 */
+}
+
+/* 셀 내부 요소 위치 잡기 위해 */
+.schedule-table tbody td.day-cell {
+  position: relative;
+}
