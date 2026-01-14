@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>간호사 스케줄 관리 - 간호사 정보 관리</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script defer src="/static/js/personnel.js"></script>
+</head>
+<body>
+<header class="top-header">
+  <h1>간호사 스케줄 관리</h1>
+  <nav class="top-nav">
+    <a href="/schedule/um">스케줄 관리</a>
+    <a href="/personnel" class="active">간호사 정보 관리</a>
+  </nav>
+</header>
+
+<main class="container">
+  <!-- 간호사 정보 입력/수정 -->
+  <section class="card">
+    <h2>간호사 정보</h2>
+    <form id="nurse-form">
+      <input type="hidden" id="nurse-id">
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>사번 <span class="required">*</span></label>
+          <input type="text" id="staff-id" required>
+          <small id="staff-dup-msg" class="form-message"></small>
+        </div>
+
+        <div class="form-group">
+          <label>이름 <span class="required">*</span></label>
+          <input type="text" id="name" required>
+        </div>
+
+        <div class="form-group">
+          <label>입사년도</label>
+          <input type="number" id="join-year" min="1980" max="2100">
+        </div>
+
+        <div class="form-group">
+          <label>연차</label>
+          <input type="number" id="years-exp" min="0" max="50" value="0">
+          <small>입사년도 또는 연차 중 하나를 입력하면 다른 값이 자동 계산됩니다.</small>
+        </div>
+
+        <div class="form-group full-width">
+          <label>업무레벨</label>
+          <div class="inline-level">
+            <select id="level-label">
+              <option value="1.0" data-mode="preset">일반</option>
+              <option value="0.7" data-mode="preset">신입</option>
+              <option value="0.8" data-mode="preset">저연차</option>
+              <option value="1.1" data-mode="preset">리더</option>
+              <option value="1.2" data-mode="preset">고연차리더</option>
+              <option value="support" data-mode="support">지원인력</option>
+              <option value="manual" data-mode="manual">수동조정</option>
+            </select>
+            <input
+              type="number"
+              id="level-custom"
+              step="0.1"
+              min="0.5"
+              max="1.5"
+              placeholder="계수 ex) 1.0"
+            >
+          </div>
+          <small>
+            기본: 신입 0.7, 저연차 0.8, 일반 1.0, 리더 1.1, 고연차리더 1.2<br>
+            지원인력: 0.7~1.2, 수동조정: 0.5~1.5 범위 내에서 직접 계수 입력 가능
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>리더 가능</label>
+          <div class="inline-checkbox">
+            <label><input type="checkbox" id="leader-d"> D</label>
+            <label><input type="checkbox" id="leader-e"> E</label>
+            <label><input type="checkbox" id="leader-n"> N</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>팀</label>
+          <input list="team-options" id="team-input" placeholder="예: A팀">
+          <datalist id="team-options"></datalist>
+        </div>
+
+        <!-- 세부 설정 토글 버튼 -->
+        <div class="form-group full-width">
+          <button type="button" id="toggle-detail-btn" class="secondary">
+            세부 설정 열기
+          </button>
+        </div>
+
+        <!-- 세부 설정 -->
+        <div id="detail-section" class="detail-section hidden">
+
+          <!-- [New] 특수 상태 태그 (Hard Constraints) -->
+          <div class="form-group full-width">
+            <label>특수 상태 (필수 제약)</label>
+            <div class="inline-checkbox">
+              <label><input type="checkbox" name="nurse-tag" value="pregnant"> 임산부 (N금지)</label>
+              <label><input type="checkbox" name="nurse-tag" value="night_keep"> N 전담</label>
+              <label><input type="checkbox" name="nurse-tag" value="fixed_day"> D 전담</label>
+              <label><input type="checkbox" name="nurse-tag" value="fixed_evening"> E 전담</label>
+            </div>
+            <small class="muted">체크 시 해당 근무 외에는 배정되지 않거나(전담), 특정 근무가 금지됩니다.</small>
+          </div>
+
+          <!-- [New] 선호/기피 근무 (Soft Preference) -->
+          <div class="form-group full-width">
+            <label>근무 선호도 (개인 선호)</label>
+            <div class="pref-grid">
+              <div class="pref-col">
+                <span class="pref-label">👍 선호 (우선 배정)</span>
+                <div class="inline-checkbox">
+                  <label><input type="checkbox" name="pref-shift" value="D"> Day</label>
+                  <label><input type="checkbox" name="pref-shift" value="E"> Evening</label>
+                  <label><input type="checkbox" name="pref-shift" value="N"> Night</label>
+                </div>
+              </div>
+              <div class="pref-col">
+                <span class="pref-label">👎 기피 (후순위)</span>
+                <div class="inline-checkbox">
+                  <label><input type="checkbox" name="avoid-shift" value="D"> Day</label>
+                  <label><input type="checkbox" name="avoid-shift" value="E"> Evening</label>
+                  <label><input type="checkbox" name="avoid-shift" value="N"> Night</label>
+                </div>
+              </div>
+            </div>
+            <small class="muted">선택하지 않은 근무는 '상관없음(Neutral)'으로 처리됩니다.</small>
+          </div>
+
+          <div class="form-group">
+            <label>단축 근무</label>
+            <select id="relative-work-days">
+              <option value="1.0">해당 없음 (1.0)</option>
+              <option value="0.8">0.8 (임산부)</option>
+              <option value="0.6">0.6</option>
+              <option value="0.4">0.4</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>프리셉터 / 프리셉티 (파트너)</label>
+            <div class="inline-precept">
+              <input
+                type="text"
+                id="precept-partner"
+                list="precept-partner-options"
+                placeholder="파트너 이름 선택"
+              >
+              <datalist id="precept-partner-options"></datalist>
+            </div>
+            <small class="muted">
+              저장 시 이름을 기반으로 내부 ID로 매칭을 시도합니다.
+            </small>
+          </div>
+
+          <div class="form-group full-width">
+            <label>같은 근무조, 팀 배제해야할 인원</label>
+            <input
+              type="text"
+              id="avoid-input"
+              list="avoid-options"
+              placeholder="이름을 콤마로 다수 선택 (예: 김간호, 이간호)"
+            >
+            <datalist id="avoid-options"></datalist>
+            <small class="muted">
+              저장 시 이름을 기반으로 내부 ID 리스트로도 함께 전송됩니다.
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" id="save-nurse-btn">저장</button>
+        <button type="button" id="reset-form-btn" class="secondary">새로 입력</button>
+        <button type="button" id="delete-nurse-btn" class="danger" style="margin-left:auto;">
+          삭제
+        </button>
+        <span id="form-message" class="form-message"></span>
+      </div>
+    </form>
+  </section>
+
+  <!-- 엑셀 업로드 -->
+  <section class="card">
+    <h2>엑셀로 추가/변경</h2>
+    <p class="muted">
+      간호사 정보를 엑셀로 관리하는 경우, 아래 템플릿을 내려받아 작성한 뒤 업로드하면 됩니다.
+      (또는 간호사 목록 다운로드 후 값만 지워서 사용해도 됩니다.)
+    </p>
+    <div class="form-group">
+      <input type="file" id="excel-file" accept=".xlsx">
+      <button id="upload-excel-btn" type="button">엑셀 업로드</button>
+      <span id="upload-result" class="form-message"></span>
+    </div>
+  </section>
+
+  <!-- 간호사 목록 -->
+  <section class="card">
+    <div class="card-header-row">
+      <h2>간호사 목록</h2>
+      <button id="download-nurses-btn" type="button">간호사 목록 다운로드</button>
+    </div>
+    <div class="ward-display" id="ward-name-display"></div>
+    <table id="nurse-table" class="table">
+      <thead>
+      <tr>
+        <th data-col="staff_id">사번</th>
+        <th data-col="name">이름</th>
+        <th data-col="years_exp">연차</th>
+        <th data-col="team">팀</th>
+        <th data-col="leader">리더</th>
+        <th data-col="precept">프리셉터</th>
+        <th data-col="avoid">Avoid</th>
+        <th data-col="work_factor">단축</th>
+        <th data-col="tags_prefs">특수/선호</th> <!-- 통합 컬럼 -->
+        <th data-col="edit">수정</th>
+      </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+</main>
+</body>
+</html>

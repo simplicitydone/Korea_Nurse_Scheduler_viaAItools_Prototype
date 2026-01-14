@@ -1,0 +1,89 @@
+{# templates/schedule_nurse.html #}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>공지용 스케줄</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+
+  <style>
+    /* 간호사용 화면에서 P 입력은 숨기거나 읽기만 보이도록 유도 */
+    .nurse-mode .p-input { display: none; }
+  </style>
+
+  <script>
+    window.appConfig = {
+      pageMode: "{{ page_mode|default('nurse_public') }}",
+      role: "{{ user.role|default('nurse') }}",
+      ward: "{{ current_ward|default('WARD1') }}",
+      wardId: "{{ ward_id if ward_id is defined else current_ward|default('WARD1') }}",
+      // [중요] nurseId가 정수형으로 렌더링되도록 확인
+      nurseId: {{ current_nurse_id | int }},
+    };
+  </script>
+  <script defer src="/static/js/schedule.js"></script>
+</head>
+<body class="nurse-mode" data-role="nurse" data-ward-id="{{ current_ward }}">
+<header class="top-header">
+  <h1>공지용 스케줄</h1>
+  <nav class="top-nav">
+    <a href="/schedule/nurse" class="active">공지용 스케줄</a>
+    <a href="/logout">로그아웃</a>
+  </nav>
+</header>
+
+<main class="container">
+
+  <!-- 상단 카드: 월 선택만 허용 -->
+  <section class="card">
+    <div class="form-row">
+      <label>월 선택</label>
+      <input type="month" id="month-input"
+             value="{{ '%04d-%02d' % (initial_year, initial_month) }}">
+      <button id="load-month-btn" type="button">다시 불러오기</button>
+    </div>
+    <p class="muted small">
+      본인 근무 희망은 Request 마감 전까지 수정 가능합니다.
+    </p>
+    <div id="schedule-meta" class="muted small"></div>
+
+    <!-- ward_id 통일 힌트(옵션) -->
+    <input type="hidden" id="ward-id" value="{{ current_ward }}">
+  </section>
+
+  <!-- 스케줄 표 -->
+  <section class="card">
+    <div class="card-header-row">
+      <h3 id="schedule-month-title">선택된 월: -</h3>
+    </div>
+    <div id="schedule-table-wrapper"></div>
+  </section>
+
+  <!-- 셀 편집 balloon -->
+  <div id="cell-editor" class="cell-editor hidden">
+    <div class="cell-editor-inner">
+      <div class="cell-editor-header">
+        <span id="cell-info">-</span>
+      </div>
+      <div class="cell-editor-body">
+        <label>
+          근무:
+          <select id="cell-shift-select">
+            <option value=""></option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+            <option value="N">N</option>
+            <option value="M">M</option>
+            <option value="C">C</option>
+            <option value="O">O</option>
+            <option value="P">P</option>
+            <option value="R">R</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>

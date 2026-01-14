@@ -1,0 +1,203 @@
+<!-- templates/schedule_um.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>간호사 스케줄 관리</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script>
+    window.appConfig = {
+      pageMode: "um",
+      role: "um",
+      wardId: "{{ ward_id }}",
+    };
+  </script>
+  <script defer src="/static/js/schedule.js"></script>
+  <script defer src="/static/js/score_rules_panel.js"></script>
+</head>
+<body data-ward-id="{{ ward_id }}" data-role="um">
+<header class="top-header">
+  <h1>간호사 스케줄 관리 <span id="ward-name-display" class="ward-badge"></span></h1>
+  <nav class="top-nav">
+    <a href="/schedule/um" class="active">스케줄 관리</a>
+    <a href="/personnel">간호사 정보 관리</a>
+  </nav>
+</header>
+
+<main class="container">
+
+  <!-- 1. 제어 패널 -->
+  <section class="card control-panel">
+    <div class="panel-row">
+      <div class="input-group">
+        <label>대상 월</label>
+        <div class="month-nav">
+            <button type="button" id="prev-month-btn" class="secondary">&lt;</button>
+            <input type="month" id="month-input">
+            <button type="button" id="curr-month-btn" class="secondary">이번달</button>
+            <button type="button" id="next-month-btn" class="secondary">&gt;</button>
+        </div>
+      </div>
+
+      <div class="input-group divider-left">
+        <label>AI 엔진 모드</label>
+        <div class="radio-group">
+            <label><input type="radio" name="opt_mode" value="manual_default"> 매뉴얼 (기본)</label>
+            <label><input type="radio" name="opt_mode" value="ml" checked> 머신러닝 (추천)</label>
+            <label><input type="radio" name="opt_mode" value="pytorch"> 딥러닝</label>
+        </div>
+              <!-- 매뉴얼 상세 옵션 (Manual 선택 시 표시) -->
+        <div id="manual-options" class="panel-row sub-controls hidden" style="background:#f9f9f9; padding:10px; border-radius:5px;">
+            <div class="input-group-row">
+                <!-- [Fix] Select Box Removed. Only Overrides remain. -->
+                <span class="label-sm">⚙️ 수동 오버라이드 (비워두면 High Quality 자동 적용):</span>
+                <input type="number" id="n_candidates" placeholder="후보(50)" class="input-sm" style="width:70px;" title="Candidates">
+                <input type="number" id="top_k" placeholder="TopK(5)" class="input-sm" style="width:60px;" title="Top K">
+                <input type="number" id="ls_iterations" placeholder="반복(2000)" class="input-sm" style="width:80px;" title="Iterations">
+            </div>
+        </div>
+      </div>
+      <div class="input-group divider-left">
+        <label>초기 생성 알고리즘 (Generator)</label>
+        <div class="radio-group">
+            <label title="데이터 없이 규칙 기반 생성"><input type="radio" name="gen_mode" value="heuristic" checked> 기본 (규칙)</label>
+            <label title="직전 근무 패턴 통계 반영"><input type="radio" name="gen_mode" value="markov"> 마르코프</label>
+            <label title="긴 문맥(LSTM) 반영"><input type="radio" name="gen_mode" value="deep"> LSTM</label>
+        </div>
+      </div>
+      <div class="input-group divider-left">
+        <label>교환 탐색 알고리즘 (Local Search)</label>
+        <div class="radio-group">
+            <label title="무작위 연산자 선택"><input type="radio" name="ls_mode" value="random" checked> 랜덤</label>
+            <label title="성공률 기반 확률적 선택 (MAB)"><input type="radio" name="ls_mode" value="mab"> MAB (통계)</label>
+            <label title="상황별 최적 연산자 예측 (DQN)"><input type="radio" name="ls_mode" value="dqn"> DQN (강화학습)</label>
+        </div>
+      </div>
+      <div class="input-group divider-left">
+        <label>인력 수요 예측 (Demand Forecast)</label>
+        <div class="radio-group">
+            <label title="팀 수 기반 고정값"><input type="radio" name="demand_mode" value="rule" checked> 사용 안함 (기본)</label>
+            <label title="RandomForest (통계 기반)"><input type="radio" name="demand_mode" value="ml"> 머신러닝</label>
+            <label title="LSTM (시계열 기반)"><input type="radio" name="demand_mode" value="deep"> 딥러닝</label>
+        </div>
+      </div>
+      <div class="input-group divider-left">
+        <label>평가 가속 (Surrogate Evaluator)</label>
+        <div class="radio-group">
+            <label title="전수 정밀 검사 (가장 정확)"><input type="radio" name="surrogate_mode" value="none" checked> 사용 안함</label>
+            <label title="Feature 기반 빠른 필터링"><input type="radio" name="surrogate_mode" value="mlp"> MLP (속도)</label>
+            <label title="이미지 패턴 기반 필터링"><input type="radio" name="surrogate_mode" value="cnn"> CNN (패턴)</label>
+        </div>
+      </div>
+      <div class="action-group">
+        <button id="generate-btn" type="button" class="primary-btn">✨ AI 스케줄 생성</button>
+      </div>
+    </div>
+
+
+
+  </section>
+
+  <!-- 2. 대시보드 (결과 리포트) -->
+  <section id="dashboard-container" class="card dashboard hidden">
+    <div class="dashboard-header">
+        <h3>📊 생성 결과 리포트</h3>
+        <div class="score-display">
+            종합 점수: <span id="dash-score" class="score-value">-</span>
+        </div>
+    </div>
+    <div class="dashboard-content">
+        <div class="report-box">
+            <h4>🤖 AI 분석 코멘트</h4>
+            <p id="dash-comment">생성된 결과가 없습니다.</p>
+        </div>
+        <div class="report-box">
+            <h4>⚠️ 주요 감점/위반 내역</h4>
+            <ul id="dash-violations" class="violation-list"></ul>
+        </div>
+    </div>
+  </section>
+
+  <!-- 3. 상세 설정 (접이식) -->
+  <section class="card collapsed-card">
+    <div class="collapsible-header" id="config-toggle">
+      <span>🛠️ 상세 설정 (팀 수, 제약조건)</span>
+      <span class="toggle-icon">▼</span>
+    </div>
+    <div class="collapsible-body hidden" id="config-body">
+
+      <!-- 인력 설정 -->
+      <div class="form-row" style="margin-bottom: 8px;">
+        <label>팀 수</label>
+        <input type="number" id="team-count-input" min="1" value="3" style="width: 80px;" readonly style="background:#eee;">
+        <button id="apply-demand-btn" class="secondary small" style="margin-left: 10px;">
+          📅 인력 배치 적용 (DB 저장)
+        </button>
+    </div>
+    <p class="small muted">
+        * '인력 배치 적용'을 누르면 위에서 선택한 예측 모델에 따라 일자별 필요 인원이 DB에 저장됩니다.<br>
+        * 특이사항이 예측된 날짜는 [스케줄 관리 -> 일별 메모]에 자동 기록됩니다.
+    </p>
+    <table class="table small-table" id="shift-needs-table" style="margin-bottom: 15px;">
+        <thead>
+          <tr>
+            <th>상황</th>
+            <th>D (필요)</th>
+            <th>E (필요)</th>
+            <th>N (필요)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-type="weekday"><td>필요 인원</td>
+            <td><input type="number" id="need-weekday-d"></td>
+            <td><input type="number" id="need-weekday-e"></td>
+            <td><input type="number" id="need-weekday-n"></td></tr>
+        </tbody>
+      </table>
+
+      <div id="demand-preview" class="muted small" style="margin-top:5px;"></div>
+      <!-- ScoreConfig 패널 (JS 로드) -->
+      <div id="score-rules-panel"></div>
+    </div>
+  </section>
+
+  <!-- 4. 스케줄 테이블 -->
+  <section class="card">
+    <div class="card-header-row">
+      <h3 id="schedule-month-title">📅 스케줄표</h3>
+      <div class="table-actions">
+        <button id="download-schedule-btn" class="secondary-btn">📥 엑셀 다운로드</button>
+      </div>
+    </div>
+    <div id="schedule-table-wrapper" class="table-wrapper"></div>
+  </section>
+
+  <!-- 로딩 오버레이 -->
+  <div id="loading-overlay" class="loading-overlay hidden">
+    <div class="loader-content">
+        <div class="spinner"></div>
+        <h3 id="loading-step">[1/3] 초기 스케줄 생성 중...</h3>
+        <p id="loading-desc">기본 제약조건을 만족하는 해를 탐색합니다.</p>
+        <button id="stop-btn" type="button" class="danger-btn" style="margin-top: 20px; padding: 8px 20px;">
+            ⏹ 생성 중지
+        </button>
+    </div>
+  </div>
+
+  <!-- 셀 편집기 (팝업) -->
+  <div id="cell-editor" class="cell-editor hidden">
+    <div class="editor-header"><span id="cell-info"></span></div>
+    <div class="editor-body">
+        <div class="shift-grid" id="shift-options">
+            <!-- JS로 버튼 생성 -->
+        </div>
+        <div class="lock-option">
+            <input type="checkbox" id="cell-locked-checkbox">
+            <label for="cell-locked-checkbox">🔒 고정 (AI가 변경 불가)</label>
+        </div>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>
