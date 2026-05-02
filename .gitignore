@@ -1,0 +1,22 @@
+.idea/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Local runtime data and generated artifacts
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.pkl
+temp/
+uploads/
+exports/
+
+# Local environment
+.env
+.env.*
+!.env.example
